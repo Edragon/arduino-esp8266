@@ -31,7 +31,7 @@ Ticker display_ticker;
 // Pins for LED MATRIX
 
 #define matrix_width 32
-#define matrix_height 16
+#define matrix_height 32
 
 // This defines the 'on' time of the display is us. The larger this number,
 // the brighter the display. If too large the ESP will crash
@@ -131,6 +131,7 @@ void setup() {
   display_update_enable(true);
 
   delay(3000);
+  
 
 }
 union single_double{
