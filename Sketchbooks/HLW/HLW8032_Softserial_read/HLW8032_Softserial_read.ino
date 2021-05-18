@@ -12,11 +12,15 @@
 // F2 5A 02 DA 78 07 1A E0 00 3D 3B 03 EC F5 4C C4 58 9C 2A 39 61 00 00 79 F2 5A 02 DA 78 07 1A E0 00 3D 3B 03 EC F5 4C C4 58 9D C2 9F 61 00 00 78 
 // please read more details on wiki page
 
-SoftwareSerial swSer(14, 12, false, 256);
+SoftwareSerial swSer;
+
+//SoftwareSerial swSer(14, 12, false, 256);
 
 void setup() {
-  Serial.begin(BAUD_RATE);
-  swSer.begin(BAUD_RATE);
+  // must also be 4800
+  Serial.begin(4800);
+  
+  swSer.begin(BAUD_RATE, SWSERIAL_8N1, D5, D6, false, 95, 11);
 
   Serial.println("\nSoftware serial test started");
 
