@@ -1,19 +1,7 @@
 
+
+// check scan should be 1/4
 #include <PxMatrix.h>
-
-#ifdef ESP32
-
-#define P_LAT 22
-#define P_A 19
-#define P_B 23
-#define P_C 18
-#define P_D 5
-#define P_E 15
-#define P_OE 2
-hw_timer_t * timer = NULL;
-portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-
-#endif
 
 #ifdef ESP8266
 
@@ -73,14 +61,6 @@ void display_updater()
 }
 #endif
 
-#ifdef ESP32
-void IRAM_ATTR display_updater(){
-  // Increment the counter and set the time of ISR
-  portENTER_CRITICAL_ISR(&timerMux);
-  display.display(display_draw_time);
-  portEXIT_CRITICAL_ISR(&timerMux);
-}
-#endif
 
 
 void display_update_enable(bool is_enable)
@@ -93,20 +73,6 @@ void display_update_enable(bool is_enable)
     display_ticker.detach();
 #endif
 
-#ifdef ESP32
-  if (is_enable)
-  {
-    timer = timerBegin(0, 80, true);
-    timerAttachInterrupt(timer, &display_updater, true);
-    timerAlarmWrite(timer, 2000, true);
-    timerAlarmEnable(timer);
-  }
-  else
-  {
-    timerDetachInterrupt(timer);
-    timerAlarmDisable(timer);
-  }
-#endif
 }
 
 
