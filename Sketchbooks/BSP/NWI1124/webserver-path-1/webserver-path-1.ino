@@ -7,7 +7,7 @@
 #include <uri/UriRegex.h>
 
 #ifndef STASSID
-#define STASSID "123"
+#define STASSID "111"
 #define STAPSK  "electrodragon"
 #endif
 
@@ -35,19 +35,23 @@ void setup(void) {
     delay(500);
     Serial.print(".");
   }
+
   Serial.println("");
   Serial.print("Connected to ");
   Serial.println(ssid);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
+
   if (MDNS.begin("esp8266")) {
     Serial.println("MDNS responder started");
   }
 
+
   server.on(F("/"), []() {
     server.send(200, "text/plain", "NWI1124 LED Board!");
   });
+
 
   server.on(UriRegex("^\\/io\\/([0-9]+)\\/val\\/([0-9]+)$"), []() {
     String esp_io = server.pathArg(0);
