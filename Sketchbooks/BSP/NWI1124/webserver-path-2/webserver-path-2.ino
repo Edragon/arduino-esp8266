@@ -53,7 +53,11 @@ void setup(void) {
   });
 
     // example
-    // http://192.168.8.103/io/16/val/1
+    // http://192.168.8.103/io/12/val/1  
+    // http://192.168.8.103/io/13/val/1  
+    // http://192.168.8.103/io/14/val/1  
+    // http://192.168.8.103/io/15/val/1  
+    // http://192.168.8.103/io/16/val/1  
     // http://192.168.8.103/io/2/val/0
     // send feedback
 
@@ -65,9 +69,9 @@ void setup(void) {
     server.send(200, "text/plain", "io: '" + esp_io + "' and val: '" + esp_val + "'");
 
     Serial.print("working on io: ");
-    Serial.print(esp_io[0]);
-    Serial.print("level: ");
-    Serial.println(esp_val[0]);
+    Serial.print(esp_io);
+    Serial.print("  level: ");
+    Serial.println(esp_val);
     
     //Serial.println(esp_io.toInt());
     //Serial.println(esp_val.toInt());
