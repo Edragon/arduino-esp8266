@@ -11,13 +11,11 @@
 #define W_LED 3 // channel W Blue
 #define R_LED 8 // channel R Blue
 
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include <WiFiClient.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
+#include <WebServer.h>
+#include <ESPmDNS.h>
 
-#include <uri/UriBraces.h>
-#include <uri/UriRegex.h>
 
 #ifndef STASSID
 #define STASSID "111"
@@ -27,7 +25,7 @@
 const char *ssid = STASSID;
 const char *password = STAPSK;
 
-ESP8266WebServer server(80);
+WebServer server(80);
 
 void setup(void) {
 

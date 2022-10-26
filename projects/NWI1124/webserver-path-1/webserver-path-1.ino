@@ -11,6 +11,7 @@
 #define W_LED 14 // channel W Blue
 #define R_LED 15 // channel R Blue
 
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -18,6 +19,7 @@
 
 #include <uri/UriBraces.h>
 #include <uri/UriRegex.h>
+
 
 #ifndef STASSID
 #define STASSID "111"
@@ -142,7 +144,3 @@ void test_LED () {
   delay(1000);
 
 }
-
-
-
-
