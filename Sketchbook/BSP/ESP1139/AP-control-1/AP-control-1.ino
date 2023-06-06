@@ -26,42 +26,42 @@ void handleRoot() {
 }
 
 void m1() {
-  server.send(200, "text/html", "<h1>OM ON</h1>");
+  server.send(200, "text/html", "<h1>onModule LED ON</h1>");
   digitalWrite(onModule_LED, LOW);
 }
 
 void m0() {
-  server.send(200, "text/html", "<h1>OM OFF</h1>");
+  server.send(200, "text/html", "<h1>onModule LED OFF</h1>");
   digitalWrite(onModule_LED, HIGH);
 }
 
 void r11() {
-  server.send(200, "text/html", "<h1>OM ON</h1>");
+  server.send(200, "text/html", "<h1>Relay1 ON</h1>");
   digitalWrite(relay1, LOW);
 }
 
 void r10() {
-  server.send(200, "text/html", "<h1>OM OFF</h1>");
+  server.send(200, "text/html", "<h1>Relay1 OFF</h1>");
   digitalWrite(relay1, HIGH);
 }
 
 void r21() {
-  server.send(200, "text/html", "<h1>OM ON</h1>");
+  server.send(200, "text/html", "<h1>Relay2 ON</h1>");
   digitalWrite(relay2, LOW);
 }
 
 void r20() {
-  server.send(200, "text/html", "<h1>OM OFF</h1>");
+  server.send(200, "text/html", "<h1>Relay2 OFF</h1>");
   digitalWrite(relay2, HIGH);
 }
 
 void b1() {
-  server.send(200, "text/html", "<h1>OM ON</h1>");
+  server.send(200, "text/html", "<h1>onBoard LED ON</h1>");
   digitalWrite(onBoard_LED, LOW);
 }
 
 void b0() {
-  server.send(200, "text/html", "<h1>OM OFF</h1>");
+  server.send(200, "text/html", "<h1>onBoard LED OFF</h1>");
   digitalWrite(onBoard_LED, HIGH);
 }
 
