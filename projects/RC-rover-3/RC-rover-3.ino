@@ -1,12 +1,19 @@
+#include <Adafruit_NeoPixel.h>
+
 // Define pins for each RC channel
-int aileronPin = 14;   // Channel 1 (Throttle)
-int elevatorPin = 12;  // Channel 2 (Steering)
+int aileronPin = 14;   // Channel 1 (Throttle) // D5
+int elevatorPin = 12;  // Channel 2 (Steering) // D6
 
-const int ENA = 5; // PWM for speed for Motor 1
-const int ENB = 4; // PWM for speed for Motor 2
+const int ENA = 5; // PWM for speed for Motor 1 // D1
+const int ENB = 4; // PWM for speed for Motor 2 // D2
 
-const int IN1 = 0; // Direction for Motor 1
-const int IN2 = 2; // Direction pin 1 for Motor 2
+const int IN1 = 0; // Direction for Motor 1  // D3 
+const int IN2 = 2; // Direction pin 1 for Motor 2 // D4
+
+// WS2812 LED Strip Configuration
+#define LED_PIN 15 // nodemcu pin D8 
+#define LED_COUNT 8 
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 long aileronControl;  // Mapped value from aileron channel (0-100)
 long elevatorControl; // Mapped value from elevator channel (0-100)
@@ -53,6 +60,10 @@ void setup() {
     analogWrite(ENB, 0);
 
     Serial.begin(9600);
+
+    strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
+    strip.show();            // Turn OFF all pixels ASAP
+    strip.setBrightness(50); // Set BRIGHTNESS to about 1/5 (max = 255)
 }
 
 // Helper function to control a single motor
@@ -100,6 +111,20 @@ long mapWithDeadband(long rcValue, int rcMin, int rcMax, int rcCenter, int deadb
     return constrain(mappedValue, outMin, outMax);
 }
 
+// Function to create a random blinking effect for WS2812 LEDs
+void randomBlinkEffect() {
+    for (int i = 0; i < LED_COUNT; i++) {
+        // Turn on a random LED with a random color
+        if (random(0, 2) == 1) { // 50% chance to turn on this LED
+            strip.setPixelColor(i, strip.Color(random(0, 256), random(0, 256), random(0, 256)));
+        } else {
+            strip.setPixelColor(i, strip.Color(0, 0, 0)); // Turn off
+        }
+    }
+    strip.show();   // Send the updated pixel colors to the hardware.
+    delay(100);     // Wait a short period
+}
+
 void loop() {
     // Read mapped control signals from each channel
     aileronControl = readAileronControlSignal();   // Throttle (0-100)
@@ -137,6 +162,9 @@ void loop() {
     // Set motor speeds and directions
     setMotorOutput(IN1, ENA, motor1Pwm); // Motor 1
     setMotorOutput(IN2, ENB, motor2Pwm); // Motor 2
+
+    // Add the LED effect
+    randomBlinkEffect();
 
     delay(20);  // Shorter delay for better responsiveness
 }
