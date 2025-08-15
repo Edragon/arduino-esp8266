@@ -34,16 +34,16 @@ int RADIO_RXEN = 27;	 // LORA ANTENNA RX ENABLE
 #endif
 #endif
 #ifdef ESP8266
-// ESP8266 - SX126x pin configuration
-int PIN_LORA_RESET = 4;	  // LORA RESET (GPIO 4 / D2)
-int PIN_LORA_DIO_1 = 2;   // LORA DIO_1 (GPIO 2 / D4)
-int PIN_LORA_BUSY = 5;	  // LORA SPI BUSY (GPIO 5 / D1)
-int PIN_LORA_NSS = 15;	  // LORA SPI CS (GPIO 15 / D8)
-int PIN_LORA_SCLK = 14;   // LORA SPI CLK (GPIO 14 / D5)
-int PIN_LORA_MISO = 12;   // LORA SPI MISO (GPIO 12 / D6)
-int PIN_LORA_MOSI = 13;   // LORA SPI MOSI (GPIO 13 / D7)
-int RADIO_TXEN = -1;	  // LORA ANTENNA TX ENABLE (not used)
-int RADIO_RXEN = -1;	  // LORA ANTENNA RX ENABLE (not used)
+// ESP32 - SX126x pin configuration
+int PIN_LORA_RESET = 0;	  // LORA RESET
+int PIN_LORA_DIO_1 = 15;  // LORA DIO_1
+int PIN_LORA_BUSY = 16;	  // LORA SPI BUSY
+int PIN_LORA_NSS = 4;	  // LORA SPI CS
+int PIN_LORA_SCLK = SCK;  // LORA SPI CLK
+int PIN_LORA_MISO = MISO; // LORA SPI MISO
+int PIN_LORA_MOSI = MOSI; // LORA SPI MOSI
+int RADIO_TXEN = -1;	  // LORA ANTENNA TX ENABLE
+int RADIO_RXEN = -1;	  // LORA ANTENNA RX ENABLE
 #endif
 #ifdef NRF52_SERIES
 // nRF52832 - SX126x pin configuration
@@ -532,5 +532,5 @@ void OnCadDone(bool cadResult)
 	g_task_event_type |= CAD_FIN;
 
 	// Wake up task to send initial packet
-	xSemaphoreGive(g_task_sem);
+	g_task_wakeup = true;
 }
