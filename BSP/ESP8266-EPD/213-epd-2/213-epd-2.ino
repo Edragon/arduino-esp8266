@@ -8,6 +8,43 @@
  ****************************************************/
 
 #include "Adafruit_EPD.h"
+#if defined(ESP8266)
+  #include <ESP8266WiFi.h>
+  extern "C" const char * system_get_sdk_version();
+#endif
+
+// --- Debug configuration -------------------------------------------------
+#define DEBUG_VERBOSE 1          // master switch
+#define ENABLE_DIAG    1          // run the full-screen diagnostic patterns
+#define ENABLE_TEXT    1          // run the text rendering test
+
+#if DEBUG_VERBOSE
+  #define DBG_INIT(baud)   Serial.begin(baud)
+  #define DBG_PRINT(x)     Serial.print(x)
+  #define DBG_PRINTLN(x)   Serial.println(x)
+  #define DBG_PRINTF(...)  Serial.printf(__VA_ARGS__)
+#else
+  #define DBG_INIT(baud)
+  #define DBG_PRINT(x)
+  #define DBG_PRINTLN(x)
+  #define DBG_PRINTF(...)
+#endif
+
+static const char* sdkVersion() {
+#if defined(ESP8266)
+  return system_get_sdk_version();
+#else
+  return "n/a";
+#endif
+}
+
+static int getWifiStatus() {
+#if defined(ESP8266)
+  return WiFi.status();
+#else
+  return -1;
+#endif
+}
 
 // ESP8266 pin mapping
 #define EPD_DC 4
@@ -96,33 +133,41 @@ static void runEPDDiagnostic() {
 }
 
 void setup() {
-  Serial.begin(115200);
-  // while (!Serial) { delay(10); }
-  Serial.println("Adafruit EPD test");
-  Serial.println("[DBG] Booting EPD test...");
+  DBG_INIT(115200);
+  DBG_PRINTLN();
+  DBG_PRINTLN("[DBG] ===== Boot =====");
+  DBG_PRINTLN("Adafruit EPD test");
+  DBG_PRINTLN("[DBG] Booting EPD test...");
   printPinConfig();
   PRINT_FREE_HEAP();
+  DBG_PRINTF("[DBG] CoreVersion=%s SDK=%s CPU=%uMHz Flash=%uKB Sketch=%u FreeSketch=%u FreeHeap=%u\n",
+             ESP.getCoreVersion().c_str(), sdkVersion(), ESP.getCpuFreqMHz(),
+             ESP.getFlashChipSize()/1024, ESP.getSketchSize(), ESP.getFreeSketchSpace(), ESP.getFreeHeap());
+  DBG_PRINTF("[DBG] Reset reason: %s\n", ESP.getResetReason().c_str());
 
   SPI.begin();
-  SPI.setFrequency(4000000); // lower SPI clock for signal integrity
-  Serial.println("[DBG] SPI.begin + SPI @ 4MHz");
+  SPI.setFrequency(4000000);
+  DBG_PRINTLN("[DBG] SPI.begin + SPI @ 4MHz (initial)");
 
   printBusyState("before begin");
-  Serial.println("[DBG] Calling display.begin()...");
   uint32_t t0 = millis();
   display.begin();
   uint32_t t1 = millis();
   printBusyState("after begin");
-  Serial.print("[DBG] display.begin() took "); Serial.print(t1 - t0); Serial.println(" ms");
-  Serial.print("[DBG] Display size: "); Serial.print(display.width()); Serial.print(" x "); Serial.println(display.height());
+  DBG_PRINTF("[DBG] display.begin() took %lu ms\n", (unsigned long)(t1 - t0));
+  DBG_PRINTF("[DBG] Display size: %u x %u\n", display.width(), display.height());
   display.setRotation(0);
-  Serial.print("[DBG] Rotation set to "); Serial.println(0);
+  DBG_PRINTF("[DBG] Rotation set to %d\n", 0);
+  PRINT_FREE_HEAP();
 
-  // Quick diagnostic to verify polarity/driver. Comment out if not needed.
-  // runEPDDiagnostic();
+#if ENABLE_DIAG
+  DBG_PRINTLN("[DBG] Running diagnostic patterns...");
+  runEPDDiagnostic();
+  PRINT_FREE_HEAP();
+#endif
 
-  // large block of text
-  Serial.println("[DBG] Clearing buffer for text...");
+#if ENABLE_TEXT
+  DBG_PRINTLN("[DBG] Preparing text test...");
   display.clearBuffer();
   const char *msg =
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur "
@@ -131,49 +176,37 @@ void setup() {
       "neque ut ante pretium vitae malesuada nunc bibendum. Nullam aliquet "
       "ultrices massa eu hendrerit. Ut sed nisi lorem. In vestibulum purus a "
       "tortor imperdiet posuere. ";
-  Serial.print("[DBG] Drawing text, length="); Serial.println(strlen(msg));
+  DBG_PRINTF("[DBG] Drawing text, length=%u\n", (unsigned)strlen(msg));
   testdrawtext(msg, COLOR1);
-  Serial.println("[DBG] Updating display (text)...");
-  t0 = millis();
   printBusyState("before text update");
+  t0 = millis();
   display.display();
   t1 = millis();
   printBusyState("after text update");
-  Serial.print("[DBG] Display update took "); Serial.print(t1 - t0); Serial.println(" ms");
+  DBG_PRINTF("[DBG] Text display() took %lu ms\n", (unsigned long)(t1 - t0));
   PRINT_FREE_HEAP();
+  display.powerDown();
+  DBG_PRINTLN("[DBG] Display powered down");
+#endif
 
-  delay(5000);
-
-  Serial.println("[DBG] Clearing buffer for line test...");
-  display.clearBuffer();
-  Serial.println("[DBG] Drawing diagonal fan lines (BLACK)...");
-  for (int16_t i = 0; i < display.width(); i += 4) {
-    display.drawLine(0, 0, i, display.height() - 1, COLOR1);
-    // yield to avoid WDT resets
-    if ((i & 0x3F) == 0) yield();
-  }
-
-  Serial.println("[DBG] Drawing diagonal fan lines (COLOR2)...");
-  for (int16_t i = 0; i < display.height(); i += 4) {
-    display.drawLine(display.width() - 1, 0, 0, i, COLOR2);
-    if ((i & 0x3F) == 0) yield();
-  }
-  Serial.println("[DBG] Updating display (lines)...");
-  t0 = millis();
-  printBusyState("before line update");
-  display.display();
-  t1 = millis();
-  printBusyState("after line update");
-  Serial.print("[DBG] Display update took "); Serial.print(t1 - t0); Serial.println(" ms");
-  PRINT_FREE_HEAP();
+  DBG_PRINTLN("[DBG] Setup complete");
 }
 
 void loop() {
-  // don't do anything!
+  // Idle loop; could add periodic status
+  delay(1000);
+  if (DEBUG_VERBOSE) {
+    static uint32_t last = 0; 
+    uint32_t now = millis();
+    if (now - last >= 5000) {
+      last = now;
+      DBG_PRINTF("[DBG] Loop heartbeat. FreeHeap=%u WiFiStatus=%d\n", ESP.getFreeHeap(), getWifiStatus());
+    }
+  }
 }
 
 void testdrawtext(const char *text, uint16_t color) {
-  Serial.print("[DBG] testdrawtext color="); Serial.println(color);
+  // Serial.print("[DBG] testdrawtext color="); Serial.println(color);
   display.setCursor(0, 0);
   display.setTextColor(color);
   display.setTextWrap(true);
