@@ -15,7 +15,7 @@
 
 // --- Debug configuration -------------------------------------------------
 #define DEBUG_VERBOSE 1          // master switch
-#define ENABLE_DIAG    1          // run the full-screen diagnostic patterns
+#define ENABLE_DIAG    0          // run the full-screen diagnostic patterns
 #define ENABLE_TEXT    1          // run the text rendering test
 
 #if DEBUG_VERBOSE
